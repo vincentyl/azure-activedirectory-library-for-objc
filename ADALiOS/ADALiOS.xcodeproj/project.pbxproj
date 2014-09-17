@@ -96,6 +96,7 @@
 		97D96EDA19A18D89007387D3 /* ADOpenSSLHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 97D96ED919A18D89007387D3 /* ADOpenSSLHelper.m */; };
 		97D96F4219A28599007387D3 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97D96F3F19A28599007387D3 /* libcrypto.a */; };
 		97D96F4319A28599007387D3 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97D96F4019A28599007387D3 /* libssl.a */; };
+		E1B38FA4124E462BBD0ADBBE /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A6928D8984344FCA8E19BA54 /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -333,6 +334,8 @@
 		97D96F3F19A28599007387D3 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
 		97D96F4019A28599007387D3 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
 		97D96F4119A28599007387D3 /* OSSREADME_0714.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = OSSREADME_0714.txt; sourceTree = "<group>"; };
+		A6928D8984344FCA8E19BA54 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		F94DF5E929C140C0B89FC61C /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = ../Pods/Pods.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -344,6 +347,7 @@
 				8BA729B117FE0BDA00CACB46 /* UIKit.framework in Frameworks */,
 				8B0965AE17F25770002BDFB8 /* Foundation.framework in Frameworks */,
 				97D96F4219A28599007387D3 /* libcrypto.a in Frameworks */,
+				E1B38FA4124E462BBD0ADBBE /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -377,6 +381,7 @@
 				8BFEF063182DA57800122C0C /* ADALiOSBundle */,
 				8B0965AC17F25770002BDFB8 /* Frameworks */,
 				8B0965AB17F25770002BDFB8 /* Products */,
+				F94DF5E929C140C0B89FC61C /* Pods.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -401,6 +406,7 @@
 				8B0965BE17F25770002BDFB8 /* UIKit.framework */,
 				8BFEF05D182DA57800122C0C /* Cocoa.framework */,
 				8BFEF05F182DA57800122C0C /* Other Frameworks */,
+				A6928D8984344FCA8E19BA54 /* libPods.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -693,10 +699,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8B0965CD17F25770002BDFB8 /* Build configuration list for PBXNativeTarget "ADALiOS" */;
 			buildPhases = (
+				372BCFCC9FE14B7987A0820B /* Check Pods Manifest.lock */,
 				8B0965A817F25770002BDFB8 /* Copy Files */,
 				8B0965A617F25770002BDFB8 /* Sources */,
 				8B0965A717F25770002BDFB8 /* Frameworks */,
 				8B19339718BAEDE4008FD93A /* ShellScript */,
+				D446DB5DB0DD42568C63ED54 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -795,6 +803,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		372BCFCC9FE14B7987A0820B /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
 		8B19339718BAEDE4008FD93A /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -821,6 +844,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -e\nset +u\n# Avoid recursively calling this script.\nif [[ $SF_MASTER_SCRIPT_RUNNING ]]\nthen\nexit 0\nfi\nset -u\nexport SF_MASTER_SCRIPT_RUNNING=1\n\nSF_TARGET_NAME=${PROJECT_NAME}\n\nSF_EXECUTABLE_PATH=\"lib${SF_TARGET_NAME}.a\"\nSF_WRAPPER_NAME=\"${SF_TARGET_NAME}.framework\"\nSF_RESOURCES_NAME=\"${SF_TARGET_NAME}.bundle\"\n\n# The following conditionals come from\n# https://github.com/kstenerud/iOS-Universal-Framework\n\nif [[ \"$SDK_NAME\" =~ ([A-Za-z]+) ]]\nthen\nSF_SDK_PLATFORM=${BASH_REMATCH[1]}\n#echo \"SF_SDK_PLATFORM: $SF_SDK_PLATFORM\"\nelse\necho \"Could not find platform name from SDK_NAME: $SDK_NAME\"\nexit 1\nfi\n\nif [[ \"$SDK_NAME\" =~ ([0-9]+.*$) ]]\nthen\nSF_SDK_VERSION=${BASH_REMATCH[1]}\n#echo \"SF_SDK_VERSION: $SF_SDK_VERSION\"\nelse\necho \"Could not find sdk version from SDK_NAME: $SDK_NAME\"\nexit 1\nfi\n\nif [[ \"$SF_SDK_PLATFORM\" = \"iphoneos\" ]]\nthen\nSF_OTHER_PLATFORM=iphonesimulator\nelse\nSF_OTHER_PLATFORM=iphoneos\nfi\n\nif [[ \"$BUILT_PRODUCTS_DIR\" =~ (.*)$SF_SDK_PLATFORM$ ]]\nthen\nSF_OTHER_BUILT_PRODUCTS_DIR=\"${BASH_REMATCH[1]}${SF_OTHER_PLATFORM}\"\nelse\necho \"Could not find platform name from build products directory: $BUILT_PRODUCTS_DIR\"\nexit 1\nfi\n\n# Build the other platform.\necho \"Using command-line build for $SF_OTHER_PLATFORM$SF_SDK_VERSION\"\n\nxcodebuild -project \"${PROJECT_FILE_PATH}\" -target \"${TARGET_NAME}\" -configuration \"${CONFIGURATION}\" -sdk ${SF_OTHER_PLATFORM}${SF_SDK_VERSION} BUILD_DIR=\"${BUILD_DIR}\" OBJROOT=\"${OBJROOT}\" BUILD_ROOT=\"${BUILD_ROOT}\" SYMROOT=\"${SYMROOT}\" $ACTION\n\n\n# Smash the two static libraries into one fat binary and store it in the .framework\necho \"Using lipo to create the fat binary\"\nlipo -create \"${BUILT_PRODUCTS_DIR}/${SF_EXECUTABLE_PATH}\" \"${SF_OTHER_BUILT_PRODUCTS_DIR}/${SF_EXECUTABLE_PATH}\" -output \"${BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/${SF_TARGET_NAME}\"\n\n# Copy the binary to the other architecture folder to have a complete framework in both.\ncp -a \"${BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/${SF_TARGET_NAME}\" \"${SF_OTHER_BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/${SF_TARGET_NAME}\"\n\n# Copy resources\n# At this point, we cannot make xCode use the resources inside the framework automatically. As such, we currently have an explicit bundle file to be used.\n# echo \"Copying Resources to ${BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/Resources\"\n\n# /bin/cp -a \"${BUILT_PRODUCTS_DIR}/${SF_RESOURCES_NAME}\" \"${BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/Resources/${SF_RESOURCES_NAME}\"\n# /bin/cp -a \"${BUILT_PRODUCTS_DIR}/${SF_RESOURCES_NAME}\" \"${SF_OTHER_BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/Resources/${SF_RESOURCES_NAME}\"\n";
+		};
+		D446DB5DB0DD42568C63ED54 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/../Pods/Pods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1008,6 +1046,7 @@
 		};
 		8B0965CE17F25770002BDFB8 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F94DF5E929C140C0B89FC61C /* Pods.xcconfig */;
 			buildSettings = {
 				DEAD_CODE_STRIPPING = NO;
 				DSTROOT = /usr/local/lib;
@@ -1025,7 +1064,6 @@
 					"$(PROJECT_DIR)/OpenSSL/lib",
 				);
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "-ObjC";
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PUBLIC_HEADERS_FOLDER_PATH = "Headers/$(PROJECT_NAME)";
@@ -1038,6 +1076,7 @@
 		};
 		8B0965CF17F25770002BDFB8 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F94DF5E929C140C0B89FC61C /* Pods.xcconfig */;
 			buildSettings = {
 				DEAD_CODE_STRIPPING = NO;
 				DSTROOT = /usr/local/lib;
@@ -1054,7 +1093,6 @@
 					"$(PROJECT_DIR)/OpenSSL/lib",
 				);
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "-ObjC";
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PUBLIC_HEADERS_FOLDER_PATH = "Headers/$(PROJECT_NAME)";
@@ -1159,6 +1197,7 @@
 		};
 		8B41A1E91888C6350027EE1E /* CodeCoverage */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F94DF5E929C140C0B89FC61C /* Pods.xcconfig */;
 			buildSettings = {
 				DEAD_CODE_STRIPPING = NO;
 				DSTROOT = /usr/local/lib;
@@ -1176,7 +1215,6 @@
 					"$(PROJECT_DIR)/OpenSSL/lib",
 				);
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "-ObjC";
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PUBLIC_HEADERS_FOLDER_PATH = "Headers/$(PROJECT_NAME)";

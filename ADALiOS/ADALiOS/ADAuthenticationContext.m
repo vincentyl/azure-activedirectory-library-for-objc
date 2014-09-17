@@ -278,6 +278,123 @@ return; \
                                   completionBlock:completionBlock];
 }
 
+
+
+-(void) acquireTokenWithResourceUsingUserCredentials: (NSString*) resource
+                                              userId: (NSString*) userId
+                                            password: (NSString*) password
+                                            clientId: (NSString*) clientId
+                                         redirectUri: (NSURL*) redirectUri
+                                     completionBlock: (ADAuthenticationCallback) completionBlock
+{
+    
+    API_ENTRY;
+    THROW_ON_NIL_EMPTY_ARGUMENT(resource);
+    THROW_ON_NIL_EMPTY_ARGUMENT(userId);
+    THROW_ON_NIL_EMPTY_ARGUMENT(password);
+    THROW_ON_NIL_EMPTY_ARGUMENT(clientId);
+    THROW_ON_NIL_ARGUMENT(completionBlock);
+
+    [self internalAcquireTokenWithResourceUsingUserCredentials:resource
+                                  clientId:clientId
+                               userId:userId
+                            password:password
+                                    redirectUri:redirectUri
+                                  tryCache:YES
+                         validateAuthority:self.validateAuthority
+                             correlationId:self.correlationId
+                           completionBlock:completionBlock];
+    
+}
+
+
+
+-(void) internalAcquireTokenWithResourceUsingUserCredentials: (NSString*) resource
+                                                    clientId: (NSString*) clientId
+                                                      userId: (NSString*) userId
+                                                    password: (NSString*) password
+                                                 redirectUri: (NSURL*) redirectUri
+                                                    tryCache: (BOOL) tryCache /* set internally to avoid infinite recursion */
+                                           validateAuthority: (BOOL) validateAuthority
+                                               correlationId: (NSUUID*) correlationId
+                                             completionBlock: (ADAuthenticationCallback) completionBlock
+{
+    
+    
+    [self updateCorrelationId:&correlationId];
+    
+    if (validateAuthority)
+    {
+        [[ADInstanceDiscovery sharedInstance] validateAuthority:self.authority correlationId:correlationId completionBlock:^(BOOL validated, ADAuthenticationError *error)
+         {
+             if (error)
+             {
+                 completionBlock([ADAuthenticationResult resultFromError:error]);
+             }
+             else
+             {
+                 [self internalAcquireTokenWithResourceUsingUserCredentials:resource
+                                                                   clientId:clientId
+                                                                userId:userId
+                                                             password:password
+                                                                     redirectUri:redirectUri
+                                                                   tryCache:tryCache
+                                                          validateAuthority:NO /* Already validated in this block. */
+                                                              correlationId:correlationId
+                                                            completionBlock:completionBlock];
+             }
+         }];
+        return;//The asynchronous handler above will do the work.
+    }
+    
+    //Check the cache:
+    ADAuthenticationError* error;
+    //We are explicitly creating a key first to ensure indirectly that all of the required arguments are correct.
+    //This is the safest way to guarantee it, it will raise an error, if the the any argument is not correct:
+    ADTokenCacheStoreKey* key = [ADTokenCacheStoreKey keyWithAuthority:self.authority resource:resource clientId:clientId error:&error];
+    if (!key)
+    {
+        //If the key cannot be extracted, call the callback with the information:
+        ADAuthenticationResult* result = [ADAuthenticationResult resultFromError:error];
+        completionBlock(result);
+        return;
+    }
+    
+    if (tryCache && self.tokenCacheStore)
+    {
+        //Cache should be used in this case:
+        BOOL accessTokenUsable;
+        ADTokenCacheStoreItem* cacheItem = [self findCacheItemWithKey:key userId:userId useAccessToken:&accessTokenUsable error:&error];
+        if (error)
+        {
+            completionBlock([ADAuthenticationResult resultFromError:error]);
+            return;
+        }
+        
+        if (cacheItem)
+        {
+            //Found a promising item in the cache, try using it:
+//            [self attemptToUseCacheItem:cacheItem
+//                         useAccessToken:accessTokenUsable
+//                               resource:resource
+//                               clientId:clientId
+//                            redirectUri:redirectUri
+//                         promptBehavior:promptBehavior
+//                                 silent:silent
+//                                 userId:userId
+//                   extraQueryParameters:queryParams
+//                          correlationId:correlationId
+//                        completionBlock:completionBlock];
+            return; //The tryRefreshingFromCacheItem has taken care of the token obtaining
+        }
+    }
+    
+}
+
+
+
+
+
 //Returns YES if we shouldn't attempt other means to get access token.
 //
 -(BOOL) isFinalResult: (ADAuthenticationResult*) result

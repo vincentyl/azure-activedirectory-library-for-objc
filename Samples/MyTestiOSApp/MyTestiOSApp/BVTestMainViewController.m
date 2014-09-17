@@ -36,6 +36,7 @@
 - (IBAction)expireAllPressed:(id)sender;
 - (IBAction)promptAlways:(id)sender;
 - (IBAction)acquireTokenSilentAction:(id)sender;
+- (IBAction)wsTrustFlowAction:(id)sender;
 @end
 
 @implementation BVTestMainViewController
@@ -366,6 +367,18 @@
     
     
 }
+
+
+
+- (IBAction)wsTrustFlowAction:(id)sender
+{
+    
+    [self setStatus:@"Executing WS-Trust flow"];
+    
+    
+}
+
+
 
 
 @end

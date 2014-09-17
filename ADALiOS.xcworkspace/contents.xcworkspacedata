@@ -1,10 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Workspace
-   version = "1.0">
-   <FileRef
-      location = "container:ADALiOS/ADALiOS.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:Samples/MyTestiOSApp/MyTestiOSApp.xcodeproj">
-   </FileRef>
-</Workspace>
+<?xml version='1.0' encoding='UTF-8'?><Workspace version='1.0'><FileRef location='container:ADALiOS/ADALiOS.xcodeproj'/><FileRef location='group:Samples/MyTestiOSApp/MyTestiOSApp.xcodeproj'/><FileRef location='group:ADALiOS/ADALiOS.xcodeproj'/><FileRef location='group:Pods/Pods.xcodeproj'/></Workspace>

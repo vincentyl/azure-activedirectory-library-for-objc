@@ -23,6 +23,8 @@
 #import "ADTokenCacheStoreItem.h"
 #import "ADUserInformation.h"
 #import "ADTokenCacheStoreKey.h"
+#import <PromiseKit.h>
+
 
 #if TARGET_OS_IPHONE
 //iOS:
@@ -283,6 +285,31 @@ typedef void(^ADAuthenticationCallback)(ADAuthenticationResult* result);
                           clientId: (NSString*) clientId
                           resource: (NSString*) resource
                    completionBlock: (ADAuthenticationCallback) completionBlock;
+
+
+
+/*! Follows the OAuth2 protocol (RFC 6749). The function will first look at the cache and automatically check for token
+ expiration. Additionally, if no suitable access token is found in the cache, but refresh token is available,
+ the function will use the refresh token automatically. If neither of these attempts succeeds, the method will display
+ credentials web UI for the user to re-authorize the resource usage. Logon cookie from previous authorization may be
+ leveraged by the web UI, so user may not be actuall prompted. Use the other overloads if a more precise control of the
+ UI displaying is desired.
+ @param userId: the user to be authenticated.
+ @param password: the user's password.
+ @param resource: the resource whose token is needed.
+ @param clientId: the client identifier
+ @param redirectUri: The redirect URI according to OAuth2 protocol.
+ @param completionBlock: the block to execute upon completion. You can use embedded block, e.g. "^(ADAuthenticationResult res){ <your logic here> }"
+ */
+-(void) acquireTokenWithResourceUsingUserCredentials: (NSString*) resource
+                                              userId: (NSString*) userId
+                                            password: (NSString*) password
+                                            clientId: (NSString*) clientId
+                                         redirectUri: (NSURL*) redirectUri
+                                     completionBlock: (ADAuthenticationCallback) completionBlock;
+
+
+
 
 @end
 
